@@ -1,4 +1,4 @@
 mv2it-go
 ========
 
-mv2.it in Go
+Go implementation for mv2.it

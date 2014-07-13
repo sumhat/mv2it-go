@@ -55,11 +55,11 @@ func userContentHandler(w http.ResponseWriter, r *http.Request) {
 		url2Fetch := urlEntry.Target[2:]
 		httpRequest, err := http.NewRequest("GET", url2Fetch, nil)
 		transport := &urlfetch.Transport{
-			Context: appengine.NewContext(r),
+			Context:  appengine.NewContext(r),
 			Deadline: 60 * time.Second,
 		}
-		httpClient := http.Client{Transport:transport}
-    	resp, err := httpClient.Do(httpRequest)
+		httpClient := http.Client{Transport: transport}
+		resp, err := httpClient.Do(httpRequest)
 		if err != nil {
 			//http.Redirect(w, r, url2Fetch, 302)
 			fmt.Fprint(w, "error: ", err)
