@@ -43,6 +43,23 @@ func LoadUrlEntry(c appengine.Context, id string) (*UrlEntry, error) {
 	return urlEntry, err
 }
 
+func FetchUrl(url string, context appengine.Context) (body []byte, contentType string, err error) {
+	httpRequest, err := http.NewRequest("GET", url, nil)
+	transport := &urlfetch.Transport{
+		Context:  context,
+		Deadline: 60 * time.Second,
+	}
+	httpClient := http.Client{Transport: transport}
+	resp, err := httpClient.Do(httpRequest)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	contentType = resp.Header.Get("Content-Type")
+	body, err = ioutil.ReadAll(resp.Body)
+	return
+}
+
 func init() {
 	http.HandleFunc("/", userContentHandler)
 }
@@ -62,26 +79,12 @@ func userContentHandler(w http.ResponseWriter, r *http.Request) {
 
 	if strings.HasPrefix(urlEntry.Target, "c:") {
 		url2Fetch := urlEntry.Target[2:]
-		httpRequest, err := http.NewRequest("GET", url2Fetch, nil)
-		transport := &urlfetch.Transport{
-			Context:  appengine.NewContext(r),
-			Deadline: 60 * time.Second,
-		}
-		httpClient := http.Client{Transport: transport}
-		resp, err := httpClient.Do(httpRequest)
-		if err != nil {
-			//http.Redirect(w, r, url2Fetch, 302)
-			fmt.Fprint(w, "error: ", err)
-			return
-		}
-		defer resp.Body.Close()
-		contentType := resp.Header["Content-Type"]
-		body, err := ioutil.ReadAll(resp.Body)
+		body, contentType, err := FetchUrl(url2Fetch, appengine.NewContext(r))
 		if err != nil {
 			fmt.Fprint(w, "error: ", err)
 			return
 		}
-		w.Header()["Content-Type"] = contentType
+		w.Header().Set("Content-Type", contentType)
 		w.Write(body)
 		return
 	}
