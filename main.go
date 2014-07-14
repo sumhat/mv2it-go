@@ -21,6 +21,28 @@ type UrlEntry struct {
 	Operation      string    `datastore:"-"`
 }
 
+func LoadUrlEntry(c appengine.Context, id string) (*UrlEntry, error) {
+	urlEntry := new(UrlEntry)
+	context, err := appengine.Namespace(c, "core")
+	if err != nil {
+		return urlEntry, err
+	}
+	
+	key := datastore.NewKey(context, "Url", urlEntry.Id, 0, nil)
+	err = datastore.RunInTransaction(context, func(tc appengine.Context) error {
+		err := datastore.Get(tc, key, urlEntry)
+		if err != nil {
+			return err
+		}
+		urlEntry.LastAccessed = time.Now()
+		urlEntry.Clicks++
+		_, err = datastore.Put(tc, key, urlEntry)
+		return err
+	}, nil)
+	urlEntry.Id = id
+	return urlEntry, err
+}
+
 func init() {
 	http.HandleFunc("/", userContentHandler)
 }
@@ -31,20 +53,7 @@ func userContentHandler(w http.ResponseWriter, r *http.Request) {
 		path = path[1:]
 	}
 	context := appengine.NewContext(r)
-	context, _ = appengine.Namespace(context, "core")
-	key := datastore.NewKey(context, "Url", path, 0, nil)
-
-	urlEntry := new(UrlEntry)
-	error := datastore.RunInTransaction(context, func(c appengine.Context) error {
-		err := datastore.Get(c, key, urlEntry)
-		if err != nil {
-			return err
-		}
-		urlEntry.LastAccessed = time.Now()
-		urlEntry.Clicks++
-		_, err = datastore.Put(c, key, urlEntry)
-		return err
-	}, nil)
+	urlEntry, error := LoadUrlEntry(context, path)
 
 	if error != nil {
 		fmt.Fprint(w, path, " not found: ", error)
