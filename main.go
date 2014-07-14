@@ -27,7 +27,8 @@ func LoadUrlEntry(c appengine.Context, id string) (*UrlEntry, error) {
 	if err != nil {
 		return urlEntry, err
 	}
-	
+
+	urlEntry.Id = id
 	key := datastore.NewKey(context, "Url", urlEntry.Id, 0, nil)
 	err = datastore.RunInTransaction(context, func(tc appengine.Context) error {
 		err := datastore.Get(tc, key, urlEntry)
@@ -39,7 +40,6 @@ func LoadUrlEntry(c appengine.Context, id string) (*UrlEntry, error) {
 		_, err = datastore.Put(tc, key, urlEntry)
 		return err
 	}, nil)
-	urlEntry.Id = id
 	return urlEntry, err
 }
 
