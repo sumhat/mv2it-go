@@ -9,7 +9,14 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"gservice/translate"
 )
+
+type UserEntry struct {
+	Id             string
+	Role           string
+	TimeOutSeconds int64
+}
 
 type UrlEntry struct {
 	Id             string    `datastore:"-"`
@@ -61,6 +68,7 @@ func FetchUrl(url string, context appengine.Context) (body []byte, contentType s
 }
 
 func init() {
+	translate.Init()
 	http.HandleFunc("/", userContentHandler)
 }
 

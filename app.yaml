@@ -1,5 +1,5 @@
 application: root-array-523
-version: 17
+version: 18
 runtime: go
 api_version: go1
 
@@ -7,6 +7,10 @@ handlers:
 - url: /(.*\.(gif|png|jpg|ico))$
   static_files: static/\1
   upload: static/.*\.(gif|png|jpg|ico)$
+
+- url: /gservice/js/(.*\.js)$
+  static_files: gservice/js/\1
+  upload: gservice/js/.*\.js$
 
 - url: /.*
   script: _go_app
