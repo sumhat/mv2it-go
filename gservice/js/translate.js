@@ -23,7 +23,7 @@ var destText = jQuery('<div id="translate_dest"></div>');
 
 var translateButton = jQuery('<button>翻译</button>');
 jQuery(translateButton).click(function() {
-  var url = location.protocol + "//leonax.net/gbridge/translate";
+  var url = location.protocol + "//leonax.net/gservice/translate";
   url += "?q=" + encodeURIComponent(jQuery(srcText).val());
   url += "&s=" + jQuery(srcLangList).val();
   url += "&t=" + jQuery(destLangList).val();
@@ -32,13 +32,14 @@ jQuery(translateButton).click(function() {
   });
 });
 
+var srcLangOptionPanel = jQuery('<div></div>').append('<span>源语言：</span>').append(srcLangList);
+var destLangOptionPanel = jQuery('<div></div>').append('<span>目标语言：</span>').append(destLangList);
+
 var optionPanel = jQuery('<div></div>');
 jQuery(optionPanel)
-    .append('<span>源语言：</span>')
-    .append(srcLangList)
+    .append(srcLangOptionPanel)
     .append('<span style="margin-right:50px;"></span>')
-    .append('<span>目标语言：</span>')
-    .append(destLangList)
+    .append(destLangOptionPanel)
     .append('<span style="margin-right:50px;"></span>')
     .append(translateButton);
 

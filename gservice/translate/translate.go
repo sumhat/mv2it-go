@@ -4,6 +4,7 @@ import (
 	"appengine"
 	"appengine/urlfetch"
 	"fmt"
+	"gservice"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -20,7 +21,7 @@ func FetchTranslations(context appengine.Context, q string, srcLang string, dest
 		return
 	}
 	query := tUrl.Query()
-	query.Set("key", "AIzaSyDnDbRY3cM8K2I9GNycPFRuUqsX_u9vH1g")
+	query.Set("key", gservice.Key)
 	query.Set("q", q)
 	query.Set("source", srcLang)
 	query.Set("target", destLang)
@@ -52,7 +53,9 @@ func handleTranslate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	v, err := FetchTranslations(appengine.NewContext(r), q, srcLang, destLang)
+	context := appengine.NewContext(r)
+	context.Infof("Translate: %s", q)
+	v, err := FetchTranslations(context, q, srcLang, destLang)
 	if err != nil {
 		fmt.Fprint(w, err)
 		return
