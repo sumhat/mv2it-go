@@ -25,10 +25,6 @@ type ItemEntry struct {
 	Owner	string `datastore:"owner"`
 }
 
-func fetchItemEntry(c appengine.Context, id string, func ()) {
-	
-}
-
 func LoadItemEntry(c appengine.Context, id string) (*ItemEntry, error) {
 	itemEntry := new(ItemEntry)
 	context, err := appengine.Namespace(c, Namespace)
@@ -49,8 +45,4 @@ func LoadItemEntry(c appengine.Context, id string) (*ItemEntry, error) {
 		return err
 	}, nil)
 	return itemEntry, err
-}
-
-func ExtendItemTimeout(c appengine.Context, seconds2Extend int64, id string) error {
-
 }
