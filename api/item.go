@@ -1,0 +1,56 @@
+package api
+
+import (
+	"appengine"
+	"appengine/datastore"
+	"appengine/urlfetch"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"strings"
+	"time"
+)
+
+const (
+	Namespace = "core"
+)
+
+type ItemEntry struct {
+	Id             string    `datastore:"-"`
+	Target         string    `datastore:"target",noindex`
+	Clicks         int64     `datastore:"clicks"`
+	TimeoutSeconds int64     `datastore:"timeoutSeconds"`
+	DateCreated    time.Time `datastore:"dateCreated"`
+	LastAccessed   time.Time `datastore:"lastAccessed",noindex`
+	Owner	string `datastore:"owner"`
+}
+
+func fetchItemEntry(c appengine.Context, id string, func ()) {
+	
+}
+
+func LoadItemEntry(c appengine.Context, id string) (*ItemEntry, error) {
+	itemEntry := new(ItemEntry)
+	context, err := appengine.Namespace(c, Namespace)
+	if err != nil {
+		return urlEntry, err
+	}
+
+	itemEntry.Id = id
+	key := datastore.NewKey(context, "Url", itemEntry.Id, 0, nil)
+	err = datastore.RunInTransaction(context, func(tc appengine.Context) error {
+		err := datastore.Get(tc, key, urlEntry)
+		if err != nil {
+			return err
+		}
+		itemEntry.LastAccessed = time.Now()
+		itemEntry.Clicks++
+		_, err = datastore.Put(tc, key, itemEntry)
+		return err
+	}, nil)
+	return itemEntry, err
+}
+
+func ExtendItemTimeout(c appengine.Context, seconds2Extend int64, id string) error {
+
+}

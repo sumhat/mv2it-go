@@ -48,7 +48,8 @@ func handleTranslate(w http.ResponseWriter, r *http.Request) {
 	q := query.Get("q")
 	srcLang := query.Get("s")
 	destLang := query.Get("t")
-	if len(q) == 0 || len(destLang) == 0 {
+	ck := query.Get("ck")
+	if len(q) == 0 || len(destLang) == 0 || !gservice.IsValidClientKey(ck) {
 		fmt.Fprint(w, "{}")
 		return
 	}

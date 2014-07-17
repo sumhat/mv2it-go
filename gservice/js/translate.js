@@ -1,5 +1,7 @@
 document.write('<div id="translate_main"></div>');
 
+var clientKey = "201407168391";
+
 var srcLangList = jQuery('<select id="translate_src_lang"></select>');
 jQuery(srcLangList).append(jQuery('<option value="en">英语</option>'));
 jQuery(srcLangList).append(jQuery('<option value="fr">法语</option>'));
@@ -27,13 +29,16 @@ jQuery(translateButton).click(function() {
   url += "?q=" + encodeURIComponent(jQuery(srcText).val());
   url += "&s=" + jQuery(srcLangList).val();
   url += "&t=" + jQuery(destLangList).val();
+  url += "&ck=" + clientKey;
   jQuery.post(url, function(result) {
-    destText.html(result.data.translations[0].translatedText);
+    var text = result.data.translations[0].translatedText;
+    text = text.replace("\n", "<br/>")
+    destText.html(text);
   });
 });
 
-var srcLangOptionPanel = jQuery('<div></div>').append('<span>源语言：</span>').append(srcLangList);
-var destLangOptionPanel = jQuery('<div></div>').append('<span>目标语言：</span>').append(destLangList);
+var srcLangOptionPanel = jQuery('<span></span>').append('<span>源语言：</span>').append(srcLangList);
+var destLangOptionPanel = jQuery('<span></span>').append('<span>目标语言：</span>').append(destLangList);
 
 var optionPanel = jQuery('<div></div>');
 jQuery(optionPanel)

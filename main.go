@@ -77,6 +77,10 @@ func userContentHandler(w http.ResponseWriter, r *http.Request) {
 	if strings.HasPrefix(path, "/") {
 		path = path[1:]
 	}
+	if len(path) == 0 {
+		http.Redirect(w, r, "http://leonax.net", 302)
+		return
+	}
 	context := appengine.NewContext(r)
 	urlEntry, error := LoadUrlEntry(context, path)
 
