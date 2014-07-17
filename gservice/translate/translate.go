@@ -1,4 +1,4 @@
-package "gservice/translate"
+package translate
 
 import (
 	"appengine"
