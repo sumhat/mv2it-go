@@ -20,7 +20,7 @@ func LoadItemEntry(c appengine.Context, id string) (*ItemEntry, error) {
 	itemEntry := new(ItemEntry)
 	context, err := appengine.Namespace(c, "core")
 	if err != nil {
-		return urlEntry, err
+		return itemEntry, err
 	}
 
 	itemEntry.Id = id
