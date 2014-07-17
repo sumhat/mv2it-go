@@ -1,10 +1,5 @@
 package api
 
-const (
-	DefaultUser = "anonymous"
-	Namespace = "core"
-)
-
 type GroupEntry struct {
 	Id int `datastore:"-"`
 	Name string `datastore:"name,noindex"`

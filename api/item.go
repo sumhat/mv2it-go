@@ -3,16 +3,7 @@ package api
 import (
 	"appengine"
 	"appengine/datastore"
-	"appengine/urlfetch"
-	"fmt"
-	"io/ioutil"
-	"net/http"
-	"strings"
 	"time"
-)
-
-const (
-	Namespace = "core"
 )
 
 type ItemEntry struct {
@@ -27,7 +18,7 @@ type ItemEntry struct {
 
 func LoadItemEntry(c appengine.Context, id string) (*ItemEntry, error) {
 	itemEntry := new(ItemEntry)
-	context, err := appengine.Namespace(c, Namespace)
+	context, err := appengine.Namespace(c, "core")
 	if err != nil {
 		return urlEntry, err
 	}
@@ -35,7 +26,7 @@ func LoadItemEntry(c appengine.Context, id string) (*ItemEntry, error) {
 	itemEntry.Id = id
 	key := datastore.NewKey(context, "Url", itemEntry.Id, 0, nil)
 	err = datastore.RunInTransaction(context, func(tc appengine.Context) error {
-		err := datastore.Get(tc, key, urlEntry)
+		err := datastore.Get(tc, key, itemEntry)
 		if err != nil {
 			return err
 		}
