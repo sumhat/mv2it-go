@@ -1,4 +1,4 @@
-mv2it-go
+Read me
 ========
 
 Go implementation for mv2.it
