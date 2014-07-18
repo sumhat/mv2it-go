@@ -24,3 +24,7 @@ _testmain.go
 
 # Windows files
 desktop.ini
+
+# Cloud 9 files
+.c9
+.go_appengine

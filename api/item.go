@@ -13,7 +13,7 @@ type ItemEntry struct {
 	TimeoutSeconds int64     `datastore:"timeoutSeconds"`
 	DateCreated    time.Time `datastore:"dateCreated"`
 	LastAccessed   time.Time `datastore:"lastAccessed",noindex`
-	Owner	string `datastore:"owner"`
+	Owner          string    `datastore:"owner"`
 }
 
 func LoadItemEntry(c appengine.Context, id string) (*ItemEntry, error) {

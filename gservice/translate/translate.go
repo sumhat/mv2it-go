@@ -1,6 +1,7 @@
 package translate
 
 import (
+	"api"
 	"appengine"
 	"appengine/urlfetch"
 	"fmt"
@@ -20,8 +21,12 @@ func FetchTranslations(context appengine.Context, q string, srcLang string, dest
 	if err != nil {
 		return
 	}
+	apiKey, err := api.GetConfig(context, "google_api_key")
+	if err != nil {
+		return
+	}
 	query := tUrl.Query()
-	query.Set("key", gservice.Key)
+	query.Set("key", apiKey)
 	query.Set("q", q)
 	query.Set("source", srcLang)
 	query.Set("target", destLang)

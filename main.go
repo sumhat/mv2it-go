@@ -5,11 +5,11 @@ import (
 	"appengine/datastore"
 	"appengine/urlfetch"
 	"fmt"
+	"gservice/translate"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
-	"gservice/translate"
 )
 
 type UserEntry struct {
