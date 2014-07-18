@@ -5,7 +5,7 @@ import (
 	"appengine/datastore"
 	"appengine/urlfetch"
 	"fmt"
-	"gservice/translate"
+	"gservice"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -68,7 +68,7 @@ func FetchUrl(url string, context appengine.Context) (body []byte, contentType s
 }
 
 func init() {
-	translate.Init()
+	gservice.InitTranslate()
 	http.HandleFunc("/", userContentHandler)
 }
 

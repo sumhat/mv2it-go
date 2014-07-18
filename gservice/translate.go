@@ -1,22 +1,21 @@
-package translate
+package gservice
 
 import (
 	"api"
 	"appengine"
 	"appengine/urlfetch"
 	"fmt"
-	"gservice"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"time"
 )
 
-func Init() {
+func InitTranslate() {
 	http.HandleFunc("/gservice/translate", handleTranslate)
 }
 
-func FetchTranslations(context appengine.Context, q string, srcLang string, destLang string) (data []byte, err error) {
+func fetchTranslations(context appengine.Context, q string, srcLang string, destLang string) (data []byte, err error) {
 	tUrl, err := url.Parse("https://www.googleapis.com/language/translate/v2")
 	if err != nil {
 		return
@@ -54,14 +53,14 @@ func handleTranslate(w http.ResponseWriter, r *http.Request) {
 	srcLang := query.Get("s")
 	destLang := query.Get("t")
 	ck := query.Get("ck")
-	if len(q) == 0 || len(destLang) == 0 || !gservice.IsValidClientKey(ck) {
+	if len(q) == 0 || len(destLang) == 0 || !IsValidClientKey(ck) {
 		fmt.Fprint(w, "{}")
 		return
 	}
 
 	context := appengine.NewContext(r)
 	context.Infof("Translate: %s", q)
-	v, err := FetchTranslations(context, q, srcLang, destLang)
+	v, err := fetchTranslations(context, q, srcLang, destLang)
 	if err != nil {
 		fmt.Fprint(w, err)
 		return
