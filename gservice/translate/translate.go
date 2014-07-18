@@ -21,7 +21,7 @@ func FetchTranslations(context appengine.Context, q string, srcLang string, dest
 	if err != nil {
 		return
 	}
-	apiKey, err := api.GetConfig(context, "google_api_key")
+	apiKey, err := api.GetConfig(context, "google-api-key")
 	if err != nil {
 		return
 	}

@@ -11,21 +11,24 @@ const (
 )
 
 type ConfigEntry struct {
-	Key         string    `datastore:"Key"`
-	Value string `datastore:"Value,noindex"`
+	Key         string    `datastore:"-"`
+	Value       string    `datastore:"Value,noindex"`
 }
 
 func fetchConfigFromDataStore(c appengine.Context, key string) (value string, err error) {
 	context, err := appengine.Namespace(c, "core")
 	if err != nil {
+	    c.Errorf("Error switching to core namespace: %", err)
 		return
 	}
 
-	query := datastore.NewQuery("Config").Filter("Key =", key)
-	var configs []ConfigEntry
-    _, err = query.GetAll(context, &configs)
-    if len(configs) > 0 {
-        value = configs[0].Value
+    configEntry := new(ConfigEntry)
+    dsKey := datastore.NewKey(context, "Config", key, 0, nil)
+    err = datastore.Get(context, dsKey, configEntry)
+    if err != nil {
+        c.Errorf("Error fetching config %s: %s", key, err)
+    } else {
+        value = configEntry.Value
     }
     return
 }
