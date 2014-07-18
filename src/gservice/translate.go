@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func InitTranslate() {
+func init() {
 	http.HandleFunc("/gservice/translate", handleTranslate)
 }
 
