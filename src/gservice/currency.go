@@ -1,36 +1,36 @@
 package gservice
 
 import (
-    "appengine"
-    _ "appengine/datastore"
-    "appengine/memcache"
-    "appengine/urlfetch"
-    _ "strconv"
-    "strings"
-    "unicode"
-    "time"
-    "net/http"
-    "net/url"
-    "io/ioutil"
+	"appengine"
+	_ "appengine/datastore"
+	"appengine/memcache"
+	"appengine/urlfetch"
+	"io/ioutil"
+	"net/http"
+	"net/url"
+	_ "strconv"
+	"strings"
+	"time"
+	"unicode"
 )
 
 const (
-    currency_cache_prefix = "currency_exchange_"
+	currency_cache_prefix = "currency_exchange_"
 )
 
 func init() {
-    http.HandleFunc("/gservice/currency", handleCurrency)
+	http.HandleFunc("/gservice/currency", handleCurrency)
 }
 
 type CurrencyValue struct {
-    rate int64 `datastore:"rate,noindex"`
-    date time.Time `datastore:"date,noindex"`
+	rate int64     `datastore:"rate,noindex"`
+	date time.Time `datastore:"date,noindex"`
 }
 
 type CurrencyEntry struct {
-    fromCurrency string
-    toCurrency string
-    values *[]CurrencyValue
+	fromCurrency string
+	toCurrency   string
+	values       *[]CurrencyValue
 }
 
 func stripCurrencyData(html string) int64 {
@@ -45,7 +45,7 @@ func stripCurrencyData(html string) int64 {
 	if endIndex < 0 {
 		return 0
 	}
-	html = html[startIndex : endIndex]
+	html = html[startIndex:endIndex]
 	value := int64(0)
 	for _, v := range html {
 		if unicode.IsDigit(v) {
@@ -59,7 +59,7 @@ func stripCurrencyData(html string) int64 {
 }
 
 func fetchCurrencyFromGFinance(c appengine.Context, fromCurrency string, toCurrency string) (value *CurrencyValue, err error) {
-    tUrl, err := url.Parse("https://www.google.com/finance/converter")
+	tUrl, err := url.Parse("https://www.google.com/finance/converter")
 	if err != nil {
 		return
 	}
@@ -85,20 +85,19 @@ func fetchCurrencyFromGFinance(c appengine.Context, fromCurrency string, toCurre
 		return
 	}
 	html := string(data)
-	
+
 	value = new(CurrencyValue)
 	value.rate = stripCurrencyData(html)
 	value.date = time.Now().UTC()
 	return
 }
-    
 
 func fetchCurrency(c appengine.Context, fromCurrency string, toCurrency string, days int) {
-    cachedKey := currency_cache_prefix + fromCurrency + "_" + toCurrency
-    cachedItem, err := memcache.Get(c, cachedKey);
-    if err == nil {
-    }
-    _ = cachedItem
+	cachedKey := currency_cache_prefix + fromCurrency + "_" + toCurrency
+	cachedItem, err := memcache.Get(c, cachedKey)
+	if err == nil {
+	}
+	_ = cachedItem
 }
 
 func handleCurrency(w http.ResponseWriter, r *http.Request) {
@@ -109,7 +108,7 @@ func handleCurrency(w http.ResponseWriter, r *http.Request) {
 	//strDays := query.Get("days")
 	//numDays := 1
 	//if len(strDays) > 0 {
-    //    numDays, err := strconv.ParseInt(strDays, 10, 0)
+	//    numDays, err := strconv.ParseInt(strDays, 10, 0)
 	//    if err != nil {
 	//        numDays = 1
 	//    }
