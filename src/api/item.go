@@ -16,24 +16,17 @@ type ItemEntry struct {
 	Owner          string    `datastore:"owner"`
 }
 
-func LoadItemEntry(c appengine.Context, id string) (*ItemEntry, error) {
-	itemEntry := new(ItemEntry)
-	context, err := appengine.Namespace(c, "core")
-	if err != nil {
-		return itemEntry, err
-	}
+func (this *ItemEntry) GetKey(c appengine.Context) *datastore.Key {
+	return datastore.NewKey(c, "Url", this.Id, 0, nil)
+}
 
-	itemEntry.Id = id
-	key := datastore.NewKey(context, "Url", itemEntry.Id, 0, nil)
-	err = datastore.RunInTransaction(context, func(tc appengine.Context) error {
-		err := datastore.Get(tc, key, itemEntry)
-		if err != nil {
-			return err
-		}
-		itemEntry.LastAccessed = time.Now()
-		itemEntry.Clicks++
-		_, err = datastore.Put(tc, key, itemEntry)
-		return err
-	}, nil)
-	return itemEntry, err
+func (this *ItemEntry) LoadFromDatastore(c appengine.Context) error {
+	err := datastore.Get(c, this.GetKey(c), this)
+	return err
+}
+
+func (this *ItemEntry) SaveToDatastore(c appengine.Context) error {
+	key := this.GetKey(c)
+	_, err := datastore.Put(c, key, this)
+	return err
 }
