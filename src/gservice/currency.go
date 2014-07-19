@@ -23,7 +23,7 @@ func init() {
 }
 
 type CurrencyValue struct {
-    rate float32 `datastore:"rate,noindex"`
+    rate int64 `datastore:"rate,noindex"`
     date time.Time `datastore:"date,noindex"`
 }
 
@@ -58,7 +58,7 @@ func stripCurrencyData(html string) int64 {
 	return value
 }
 
-func fetchCurrencyFromGFinance(c appengine.Context, fromCurrency string, toCurrency string) (value CurrencyValue, err error) {
+func fetchCurrencyFromGFinance(c appengine.Context, fromCurrency string, toCurrency string) (value *CurrencyValue, err error) {
     tUrl, err := url.Parse("https://www.google.com/finance/converter")
 	if err != nil {
 		return
@@ -85,7 +85,10 @@ func fetchCurrencyFromGFinance(c appengine.Context, fromCurrency string, toCurre
 		return
 	}
 	html := string(data)
-	_ = html
+	
+	value = new(CurrencyValue)
+	value.rate = stripCurrencyData(html)
+	value.date = time.Now().UTC()
 	return
 }
     

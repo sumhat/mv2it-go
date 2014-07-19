@@ -1,6 +1,7 @@
 package gservice
 
 import (
+    "appengine/aetest"
     "testing"
     "fmt"
 )
@@ -11,5 +12,21 @@ func TestStripCurrencyData(t *testing.T) {
     value := stripCurrencyData(html)
     if value != expected {
         t.Error(fmt.Sprintf("Expected %d, but actual %d", expected, value))
+    }
+}
+
+func TestFetchFromGFinance(t *testing.T) {
+    c, err := aetest.NewContext(nil)
+    if err != nil {
+        t.Fatal(err)
+    }
+    defer c.Close()
+    
+    currency, err := fetchCurrencyFromGFinance(c, "EUR", "USD")
+    if err != nil {
+        t.Error(err)
+    }
+    if currency.rate == 0 {
+        t.Error(fmt.Sprintf("Currency rate should not be 0."))
     }
 }
