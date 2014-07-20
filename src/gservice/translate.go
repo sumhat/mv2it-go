@@ -2,20 +2,18 @@ package gservice
 
 import (
 	"api"
+	"api/net"
 	"appengine"
-	"appengine/urlfetch"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
-	"time"
 )
 
 func init() {
 	http.HandleFunc("/gservice/translate", handleTranslate)
 }
 
-func fetchTranslations(context appengine.Context, q string, srcLang string, destLang string) (data []byte, err error) {
+func fetchTranslations(context appengine.Context, q string, srcLang string, destLang string) (data *net.HttpEntry, err error) {
 	tUrl, err := url.Parse("https://www.googleapis.com/language/translate/v2")
 	if err != nil {
 		return
@@ -30,19 +28,8 @@ func fetchTranslations(context appengine.Context, q string, srcLang string, dest
 	query.Set("source", srcLang)
 	query.Set("target", destLang)
 	tUrl.RawQuery = query.Encode()
-
-	httpRequest, err := http.NewRequest("GET", tUrl.String(), nil)
-	transport := &urlfetch.Transport{
-		Context:  context,
-		Deadline: 60 * time.Second,
-	}
-	httpClient := http.Client{Transport: transport}
-	resp, err := httpClient.Do(httpRequest)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	data, err = ioutil.ReadAll(resp.Body)
+	
+	data, err = net.FetchUrl(context, tUrl.String())
 	return
 }
 
@@ -66,6 +53,6 @@ func handleTranslate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(v)
+	w.Header().Set("Content-Type", v.ContentType)
+	w.Write(v.Body)
 }
