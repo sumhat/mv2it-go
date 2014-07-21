@@ -22,16 +22,14 @@ func init() {
 	http.HandleFunc("/gservice/currency", handleCurrency)
 }
 
-type CurrencyValue struct {
+type CurrencyEntry struct {
+	From string `datastore:"from" json:"from"`
+	To   string `datastore:"to" json:"to"`
 	Rate int64     `datastore:"rate,noindex" json:"rate"`
 	Date time.Time `datastore:"date,noindex" json:"date"`
 }
 
-type CurrencyEntry struct {
-	From string
-	To   string
-	Values       []CurrencyValue
-}
+type CurrencyList []CurrencyEntry
 
 func stripCurrencyData(html string) int64 {
 	const startTag = "<span class=bld>"
@@ -58,7 +56,7 @@ func stripCurrencyData(html string) int64 {
 	return value
 }
 
-func fetchCurrencyFromGFinance(c appengine.Context, fromCurrency string, toCurrency string) (value CurrencyValue, err error) {
+func fetchCurrencyFromGFinance(c appengine.Context, fromCurrency string, toCurrency string) (value CurrencyEntry, err error) {
 	tUrl, err := url.Parse("https://www.google.com/finance/converter")
 	if err != nil {
 		return
@@ -72,16 +70,18 @@ func fetchCurrencyFromGFinance(c appengine.Context, fromCurrency string, toCurre
 	httpEntry, err := net.FetchUrl(c, tUrl.String())
 	html := string(httpEntry.Body)
 
+	value.From = fromCurrency
+	value.To = toCurrency
 	value.Rate = stripCurrencyData(html)
 	value.Date = time.Now().UTC()
 	return
 }
 
-func fetchLastCurrency(c appengine.Context, fromCurrency string, toCurrency string) CurrencyValue {
+func fetchLastCurrency(c appengine.Context, fromCurrency string, toCurrency string) CurrencyEntry {
 	cachedKey := currency_cache_prefix + fromCurrency + "_" + toCurrency
 	cachedItem, err := memcache.Get(c, cachedKey)
 	if err == nil {
-		value := CurrencyValue{}
+		value := CurrencyEntry{}
 		err := json.Unmarshal(cachedItem.Value, &value)
 		if err == nil {
 			return value
@@ -102,6 +102,12 @@ func handleCurrency(w http.ResponseWriter, r *http.Request) {
 	query := cUrl.Query()
 	fromCurrency := query.Get("from")
 	toCurrency := query.Get("to")
+	if len(fromCurrency) == 0 {
+		fromCurrency = "USD"
+	}
+	if len(toCurrency) == 0 {
+		toCurrency = "CNY"
+	}
 	//strDays := query.Get("days")
 	//numDays := 1
 	//if len(strDays) > 0 {
@@ -110,9 +116,10 @@ func handleCurrency(w http.ResponseWriter, r *http.Request) {
 	//        numDays = 1
 	//    }
 	//}
-	currency := fetchLastCurrency(appengine.NewContext(r), fromCurrency, toCurrency)
-	currencyEntry := &CurrencyEntry{From: fromCurrency, To: toCurrency, Values: []CurrencyValue{currency}}
-	jsonValue, _ := json.Marshal(currencyEntry)
+	currencyEntry := fetchLastCurrency(appengine.NewContext(r), fromCurrency, toCurrency)
+	currencyData := net.NewJsonResponse().WithData([...]CurrencyEntry{currencyEntry})
+	
+	jsonValue, _ := json.Marshal(currencyData)
 	w.Header().Set("Content-Type", "application/json")
     w.Write(jsonValue)
 }
