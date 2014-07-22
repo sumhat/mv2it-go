@@ -12,7 +12,38 @@ import (
 )
 
 func init() {
+	http.HandleFunc("/quickadd", quickAdd)
 	http.HandleFunc("/", handleUrl)
+}
+
+func quickAdd(w http.ResponseWriter, r *http.Request) {
+	cUrl := r.URL
+	query := cUrl.Query()
+	t := query.Get("target")
+	
+	if !(strings.HasPrefix(t, "http://") || strings.HasPrefix(t, "https://")) {
+		fmt.Fprint(w, "{}")
+		return
+	}
+	
+	itemEntry := &api.ItemEntry{
+		Target: t,
+		TimeoutSeconds: 2700000,
+		DateCreated: time.Now().UTC(),
+		LastAccessed: time.Now().UTC(),
+	}
+	
+	context := appengine.NewContext(r)
+	context, err := appengine.Namespace(context, "core")
+	if err != nil {
+		fmt.Fprint(w, err)
+	}
+	itemEntry, err = api.AddNewItem(context, itemEntry)
+	if err != nil {
+		fmt.Fprint(w, err)
+		return
+	}
+	fmt.Fprint(w, itemEntry.Id)
 }
 
 func handleUrl(w http.ResponseWriter, r *http.Request) {
