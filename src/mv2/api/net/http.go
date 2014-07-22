@@ -22,6 +22,7 @@ func FetchUrl(context appengine.Context, url string) (httpEntry *HttpEntry, err 
 	httpClient := http.Client{Transport: transport}
 	resp, err := httpClient.Do(httpRequest)
 	if err != nil {
+		context.Errorf("Error fetching url: %v", err)
 		return
 	}
 	defer resp.Body.Close()

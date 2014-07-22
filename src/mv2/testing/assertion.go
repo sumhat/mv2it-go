@@ -9,6 +9,7 @@ import (
 
 const (
 	Rune = iota + 100
+	Nil
 )
 
 type AssertT struct {
@@ -141,7 +142,11 @@ func (this *AssertT) That(v interface{}) *ThatInterface {
 		that.stringValue = toString(v)
 		that.kind = reflect.String
 	default:
-		that.kind = reflect.TypeOf(v).Kind()
+		if v == nil {
+			that.kind = Nil
+		} else {
+			that.kind = reflect.TypeOf(v).Kind()
+		}
 	}
 	return that
 }
@@ -283,25 +288,15 @@ func (this *ThatInterface) IsFalse() {
 
 func (this *ThatInterface) IsNil() {
 	aError := newAssertError(this.t, this.prependName("%s (%s) is not nil"))
-	switch this.kind {
-	case reflect.Interface:
-		if this.origin != nil {
-			aError.raiseInterface(this.origin)
-		}
-	default:
-		panic(newUnsupportedTypeError(this.origin))
+	if this.kind != Nil {
+		aError.raiseInterface(this.origin)
 	}
 }
 
 func (this *ThatInterface) IsNotNil() {
 	aError := newAssertError(this.t, this.prependName("%s (%s) is nil"))
-	switch this.kind {
-	case reflect.Interface:
-		if this.origin == nil {
-			aError.raiseInterface(this.origin)
-		}
-	default:
-		panic(newUnsupportedTypeError(this.origin))
+	if this.kind == Nil {
+		aError.raiseInterface(this.origin)
 	}
 }
 

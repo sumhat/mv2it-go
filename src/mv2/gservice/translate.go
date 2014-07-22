@@ -13,14 +13,10 @@ func init() {
 	http.HandleFunc("/gservice/translate", handleTranslate)
 }
 
-func fetchTranslations(context appengine.Context, q string, srcLang string, destLang string) (data *net.HttpEntry, err error) {
+func getTranslationUrl(apiKey string, q string, srcLang string, destLang string) (string, error) {
 	tUrl, err := url.Parse("https://www.googleapis.com/language/translate/v2")
 	if err != nil {
-		return
-	}
-	apiKey, err := api.GetConfig(context, "google-api-key")
-	if err != nil {
-		return
+		return "", err
 	}
 	query := tUrl.Query()
 	query.Set("key", apiKey)
@@ -28,11 +24,10 @@ func fetchTranslations(context appengine.Context, q string, srcLang string, dest
 	query.Set("source", srcLang)
 	query.Set("target", destLang)
 	tUrl.RawQuery = query.Encode()
-
-	data, err = net.FetchUrl(context, tUrl.String())
-	return
+	
+	return tUrl.String(), nil
 }
-
+	
 func handleTranslate(w http.ResponseWriter, r *http.Request) {
 	cUrl := r.URL
 	query := cUrl.Query()
@@ -47,7 +42,17 @@ func handleTranslate(w http.ResponseWriter, r *http.Request) {
 
 	context := appengine.NewContext(r)
 	context.Infof("Translate: %s", q)
-	v, err := fetchTranslations(context, q, srcLang, destLang)
+	apiKey, err := api.GetConfig(context, "google-api-key")
+	if err != nil {
+		return
+	}
+	tUrl, err:= getTranslationUrl(apiKey, q, srcLang, destLang)
+	if err != nil {
+		context.Errorf("Error creating translation url: %v", err)
+		fmt.Fprint(w, err)
+		return
+	}
+	v, err := net.FetchUrl(context, tUrl)
 	if err != nil {
 		fmt.Fprint(w, err)
 		return

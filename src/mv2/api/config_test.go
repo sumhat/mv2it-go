@@ -25,6 +25,6 @@ func TestFetchFromDatastore(t *testing.T) {
 	
 	value2, err := fetchConfigFromDataStore(c2, name)
 	assert.That(err).IsNil()
-	assert.That(value2).IsEqualTo("abcde")
+	assert.That(value2).IsEqualTo("abcd")
 }
 	
