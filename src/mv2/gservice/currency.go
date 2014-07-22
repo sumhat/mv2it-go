@@ -1,11 +1,11 @@
 package gservice
 
 import (
-	"mv2/api/net"
 	"appengine"
 	_ "appengine/datastore"
 	"appengine/memcache"
 	"encoding/json"
+	"mv2/api/net"
 	"net/http"
 	"net/url"
 	_ "strconv"
@@ -23,8 +23,8 @@ func init() {
 }
 
 type CurrencyEntry struct {
-	From string `datastore:"from" json:"from"`
-	To   string `datastore:"to" json:"to"`
+	From string    `datastore:"from" json:"from"`
+	To   string    `datastore:"to" json:"to"`
 	Rate int64     `datastore:"rate,noindex" json:"rate"`
 	Date time.Time `datastore:"date,noindex" json:"date"`
 }
@@ -91,7 +91,7 @@ func fetchLastCurrency(c appengine.Context, fromCurrency string, toCurrency stri
 	if err == nil {
 		jsonValue, err := json.Marshal(value)
 		if err == nil {
-			memcache.Set(c, &memcache.Item{Key: cachedKey, Value: jsonValue, Expiration: 12*time.Hour})
+			memcache.Set(c, &memcache.Item{Key: cachedKey, Value: jsonValue, Expiration: 12 * time.Hour})
 		}
 	}
 	return value
@@ -118,8 +118,8 @@ func handleCurrency(w http.ResponseWriter, r *http.Request) {
 	//}
 	currencyEntry := fetchLastCurrency(appengine.NewContext(r), fromCurrency, toCurrency)
 	currencyData := net.NewJsonResponse().WithData([...]CurrencyEntry{currencyEntry})
-	
+
 	jsonValue, _ := json.Marshal(currencyData)
 	w.Header().Set("Content-Type", "application/json")
-    w.Write(jsonValue)
+	w.Write(jsonValue)
 }

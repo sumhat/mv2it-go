@@ -24,9 +24,7 @@ func TestJsonResponse(t *testing.T) {
 	if err != nil {
 		t.Error(fmt.Sprintf("Error unmarshalling data: %s", err))
 	}
-	if rjData.Error != "ok" {
-		t.Error(fmt.Sprintf("Expected ok, but actually %s", rjData.Error))
-	}
+	assert.That(rjData.Error).IsEqualTo("ok")
 
 	vi := rjData.Data.(map[string]interface{})["Vi"].(float64)
 	vs := rjData.Data.(map[string]interface{})["Vs"].(string)

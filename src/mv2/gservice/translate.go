@@ -1,10 +1,10 @@
 package gservice
 
 import (
-	"mv2/api"
-	"mv2/api/net"
 	"appengine"
 	"fmt"
+	"mv2/api"
+	"mv2/api/net"
 	"net/http"
 	"net/url"
 )
@@ -28,7 +28,7 @@ func fetchTranslations(context appengine.Context, q string, srcLang string, dest
 	query.Set("source", srcLang)
 	query.Set("target", destLang)
 	tUrl.RawQuery = query.Encode()
-	
+
 	data, err = net.FetchUrl(context, tUrl.String())
 	return
 }
