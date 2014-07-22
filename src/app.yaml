@@ -9,8 +9,8 @@ handlers:
   upload: static/.*\.(gif|png|jpg|ico)$
 
 - url: /gservice/js/(.*\.js)$
-  static_files: gservice/js/\1
-  upload: gservice/js/.*\.js$
+  static_files: mv2/gservice/js/\1
+  upload: mv2/gservice/js/.*\.js$
 
 - url: /.*
   script: _go_app
