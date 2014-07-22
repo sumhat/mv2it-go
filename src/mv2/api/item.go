@@ -3,9 +3,9 @@ package api
 import (
 	"appengine"
 	"appengine/datastore"
-	"time"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const (
@@ -19,7 +19,7 @@ type ItemEntry struct {
 	TimeoutSeconds int64     `datastore:"timeoutSeconds"`
 	DateCreated    time.Time `datastore:"dateCreated"`
 	LastAccessed   time.Time `datastore:"lastAccessed",noindex`
-	Owner          string    `datastore:"owner"`
+	Owner          string    `datastore:"owner",noindex`
 }
 
 func AddNewItem(c appengine.Context, itemEntry *ItemEntry) (*ItemEntry, error) {
@@ -60,4 +60,18 @@ func (this *ItemEntry) SaveToDatastore(c appengine.Context) error {
 	key := this.GetKey(c)
 	_, err := datastore.Put(c, key, this)
 	return err
+}
+
+func (this *ItemEntry) Remove(c appengine.Context) error {
+	key := this.GetKey(c)
+	return datastore.Delete(c, key)
+}
+
+func (this *ItemEntry) HasExpired() bool {
+	if this.TimeoutSeconds == 0 {
+		return false
+	}
+	now := time.Now().UTC()
+	expireDate := this.DateCreated.Add(time.Duration(this.TimeoutSeconds) * time.Second)
+	return expireDate.Before(now)
 }

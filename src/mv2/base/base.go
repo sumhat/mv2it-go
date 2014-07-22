@@ -77,6 +77,13 @@ func handleUrl(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "%s not found: %s", path, err)
 		return
 	}
+	
+	if urlEntry.HasExpired() {
+		err := urlEntry.Remove(namedContext)
+		if err != nil {
+			context.Errorf("Error removing item (%s): %v", urlEntry.Id, err)
+		}
+	}
 
 	dispatchUrl(w, r, context, urlEntry.Target)
 }
