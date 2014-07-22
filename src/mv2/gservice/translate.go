@@ -1,8 +1,8 @@
 package gservice
 
 import (
-	"api"
-	"api/net"
+	"mv2/api"
+	"mv2/api/net"
 	"appengine"
 	"fmt"
 	"net/http"

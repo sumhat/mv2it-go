@@ -1,8 +1,8 @@
 package base
 
 import (
-	"api"
-	"api/net"
+	"mv2/api"
+	"mv2/api/net"
 	"appengine"
 	"appengine/datastore"
 	"fmt"
@@ -28,6 +28,8 @@ func handleUrl(w http.ResponseWriter, r *http.Request) {
 	namedContext, err := appengine.Namespace(context, "core")
 	if err != nil {
 		context.Errorf("Error switching to core namespace: %s", err)
+		fmt.Fprintf(w, "Something wrong, please refresh the page.")
+		return
 	}
 	urlEntry := &api.ItemEntry{Id: path}
 	err = datastore.RunInTransaction(namedContext, func (tc appengine.Context) error {

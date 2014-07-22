@@ -1,7 +1,7 @@
 package gservice
 
 import (
-	"api/net"
+	"mv2/api/net"
 	"appengine"
 	_ "appengine/datastore"
 	"appengine/memcache"

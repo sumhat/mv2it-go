@@ -1,16 +1,16 @@
 package net
 
 import (
-    "appengine"
-    "appengine/urlfetch"
-    "io/ioutil"
-    "net/http"
-    "time"
+	"appengine"
+	"appengine/urlfetch"
+	"io/ioutil"
+	"net/http"
+	"time"
 )
 
 type HttpEntry struct {
-    ContentType string
-    Body []byte
+	ContentType string
+	Body        []byte
 }
 
 func FetchUrl(context appengine.Context, url string) (httpEntry *HttpEntry, err error) {
