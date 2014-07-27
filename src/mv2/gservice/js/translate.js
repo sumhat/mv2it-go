@@ -1,6 +1,6 @@
 document.write('<div id="translate_main"></div>');
 
-var clientKey = "201407168391";
+var clientKey = "20140727183457";
 
 var srcLangList = jQuery('<select id="translate_src_lang"></select>');
 jQuery(srcLangList).append(jQuery('<option value="en">英语</option>'));

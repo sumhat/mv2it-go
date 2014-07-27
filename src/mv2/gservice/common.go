@@ -1,7 +1,7 @@
 package gservice
 
 var (
-	clientKeys = [...]string{"201407168391"}
+	clientKeys = [...]string{"201407168391", "20140727183457"}
 )
 
 func IsValidClientKey(ck string) bool {
